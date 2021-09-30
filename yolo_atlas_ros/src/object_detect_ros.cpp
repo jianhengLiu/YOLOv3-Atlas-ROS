@@ -292,7 +292,7 @@ void *ObjectDetect::GetInferenceOutputItem(uint32_t &itemDataSize,
         return nullptr;
     }
 
-    size_t bufferSize = aclGetDataBufferSize(dataBuffer);
+    size_t bufferSize = aclGetDataBufferSizeV2(dataBuffer);
     if (bufferSize == 0) {
         ERROR_LOG("The %dth dataset buffer size of "
                   "model inference output is 0", idx);
@@ -390,9 +390,9 @@ std::vector<BoundingBox> ObjectDetect::nonMaximumSuppression(const float nmsThre
     std::stable_sort(binfo.begin(), binfo.end(),
                      [](const BoundingBox &b1, const BoundingBox &b2) { return b1.score > b2.score; });
     std::vector<BoundingBox> out;
-    for (auto &i : binfo) {
+    for (auto &i: binfo) {
         bool keep = true;
-        for (auto &j : out) {
+        for (auto &j: out) {
             if (keep) {
                 float overlap = computeIoU(i, j);
                 keep = overlap <= nmsThresh;
@@ -408,11 +408,11 @@ std::vector<BoundingBox>
 ObjectDetect::nmsAllClasses(const float nmsThresh, std::vector<BoundingBox> &binfo, const uint numClasses) {
     std::vector<BoundingBox> result;
     std::vector<std::vector<BoundingBox>> splitBoxes(numClasses);
-    for (auto &box : binfo) {
+    for (auto &box: binfo) {
         splitBoxes.at(box.attribute).push_back(box);
     }
 
-    for (auto &boxes : splitBoxes) {
+    for (auto &boxes: splitBoxes) {
         boxes = nonMaximumSuppression(nmsThresh, boxes);
         result.insert(result.end(), boxes.begin(), boxes.end());
     }

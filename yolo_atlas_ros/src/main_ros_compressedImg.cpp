@@ -48,11 +48,12 @@ ObjectDetect detect(kPkgPath, kModelPath, kModelWidth, kModelHeight);
 
 ros::Publisher pub_results;
 
-void img_callback(const sensor_msgs::ImageConstPtr &img_msg) {
-//    double start_t = ros::Time::now().toSec();
+void img_callback(const sensor_msgs::CompressedImageConstPtr &img_msg) {
+    double start_t = ros::Time::now().toSec();
+    cv_bridge::CvImagePtr cv_ptr;
     try {
+
 //        cout << "starttime = " << to_string(ros::Time::now().toSec()) << endl;
-        cv_bridge::CvImagePtr cv_ptr;
         cv_ptr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
         cv::Mat input_img = cv_ptr->image;
 
@@ -95,8 +96,8 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg) {
 //            }
         }
         pub_results.publish(detection_msgs);
-//        double end_t = ros::Time::now().toSec();
-//        cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
+        double end_t = ros::Time::now().toSec();
+        cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
     }
     catch (cv_bridge::Exception &e) {
         ROS_ERROR("cv_bridge exception: %s", e.what());
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
     ros::init(argc, argv, "yolo_atlas");
     ros::NodeHandle nh;
 
-    ros::Subscriber sub_img = nh.subscribe("/decompressed_img", 10, img_callback);
+    ros::Subscriber sub_img = nh.subscribe("/camera/color/image_raw/compressed", 1, img_callback);
     pub_results = nh.advertise<ros_rs_msgs::DetectionMessages>("/untracked_info", 100);
 
 //    cout << "kModelPath:" << endl << kModelPath << endl;
