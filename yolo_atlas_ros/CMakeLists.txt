@@ -113,6 +113,5 @@ target_link_libraries(yolo_atlas_nodelet
         acl_dvpp
         stdc++
         ${catkin_LIBRARIES}
-        dw
         )
 add_dependencies(yolo_atlas_nodelet ros_rs_msgs_generate_messages_cpp)

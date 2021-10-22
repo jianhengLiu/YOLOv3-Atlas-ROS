@@ -16,13 +16,6 @@
 * File main.cpp
 * Description: dvpp sample main func
 */
-#define BACKWARD_HAS_DW 1
-
-#include "backward.hpp"
-
-namespace backward {
-    backward::SignalHandling sh;
-}
 
 #include <thread>
 #include <mutex>
@@ -49,8 +42,6 @@ namespace backward {
 
 using namespace std;
 
-//Instantiate the target detection class with the parameters of the classification model path and the required width and height of the model input
-ObjectDetect *detect;
 namespace yolo_atlas_nodelet_ns {
     class yolo_atlas_nodelet : public nodelet::Nodelet {
     public:
@@ -65,6 +56,9 @@ namespace yolo_atlas_nodelet_ns {
 
             infer_thread = std::thread(&yolo_atlas_nodelet::infer_process, this);
         }
+
+        //Instantiate the target detection class with the parameters of the classification model path and the required width and height of the model input
+        ObjectDetect *detect;
 
         std::thread infer_thread;
         std::mutex m_buf;
@@ -99,7 +93,7 @@ namespace yolo_atlas_nodelet_ns {
                 }
 
                 if (!img_buf.empty()) {
-//                    double start_t = ros::Time::now().toSec();
+                    double start_t = ros::Time::now().toSec();
 
                     m_buf.lock();
                     sensor_msgs::ImageConstPtr img_msg = img_buf.front();
@@ -149,8 +143,8 @@ namespace yolo_atlas_nodelet_ns {
 //            }
                     }
                     pub_results.publish(detection_msgs);
-//                    double end_t = ros::Time::now().toSec();
-//                    cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
+                    double end_t = ros::Time::now().toSec();
+                    cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
                 }
 
                 std::chrono::milliseconds dura(10);
