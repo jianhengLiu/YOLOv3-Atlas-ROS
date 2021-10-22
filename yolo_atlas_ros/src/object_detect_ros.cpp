@@ -71,6 +71,19 @@ ObjectDetect::~ObjectDetect() {
     DestroyResource();
 }
 
+Result ObjectDetect::SetCreateContext(){
+    aclError ret = aclrtCreateContext(&ctx1, deviceId_);
+    if (ret != ACL_ERROR_NONE) {
+        ERROR_LOG("Acl Create Context failed. ret = %d", ret);
+        return FAILED;
+    }
+    ret = aclrtSetCurrentContext(ctx1);
+    if (ret != ACL_ERROR_NONE) {
+        ERROR_LOG("Acl Set Current Context failed. ret = %d", ret);
+        return FAILED;
+    }
+}
+
 Result ObjectDetect::InitResource() {
     // ACL init
     std::string aclPath = std::string(pkgPath_) + "/src/acl.json";
@@ -91,6 +104,16 @@ Result ObjectDetect::InitResource() {
         return FAILED;
     }
     INFO_LOG("Open device %d success", deviceId_);
+    ret = aclrtCreateContext(&ctx1, deviceId_);
+    if (ret != ACL_ERROR_NONE) {
+        ERROR_LOG("Acl Create Context failed");
+        return FAILED;
+    }
+    ret = aclrtSetCurrentContext(ctx1);
+    if (ret != ACL_ERROR_NONE) {
+        ERROR_LOG("Acl Set Current Context failed");
+        return FAILED;
+    }
     //Gets whether the current application is running on host or Device
     ret = aclrtGetRunMode(&runMode_);
     if (ret != ACL_ERROR_NONE) {
@@ -101,8 +124,8 @@ Result ObjectDetect::InitResource() {
     return SUCCESS;
 }
 
-Result ObjectDetect::InitModel(const char *omModelPath) {
-    Result ret = model_.LoadModelFromFileWithMem(omModelPath);
+Result ObjectDetect::InitModel() {
+    Result ret = model_.LoadModelFromFileWithMem(modelPath_);
     if (ret != SUCCESS) {
         ERROR_LOG("execute LoadModelFromFileWithMem failed");
         return FAILED;
@@ -167,7 +190,7 @@ Result ObjectDetect::Init() {
         return FAILED;
     }
     //Initializes the model management instance
-    ret = InitModel(modelPath_);
+    ret = InitModel();
     if (ret != SUCCESS) {
         ERROR_LOG("Init model failed");
         return FAILED;
@@ -207,7 +230,7 @@ Result ObjectDetect::Preprocess(cv::Mat &frame) {
     aclError ret = aclrtMemcpy(imageDataBuf_, imageDataSize_,
                                reiszeMat.ptr<uint8_t>(), imageDataSize_, policy);
     if (ret != ACL_ERROR_NONE) {
-        ERROR_LOG("Copy resized image data to device failed.");
+        ERROR_LOG("Copy resized image data to device failed. ret = %d", ret);
         return FAILED;
     }
 
@@ -292,7 +315,7 @@ void *ObjectDetect::GetInferenceOutputItem(uint32_t &itemDataSize,
         return nullptr;
     }
 
-    size_t bufferSize = aclGetDataBufferSize(dataBuffer);
+    size_t bufferSize = aclGetDataBufferSizeV2(dataBuffer);
     if (bufferSize == 0) {
         ERROR_LOG("The %dth dataset buffer size of "
                   "model inference output is 0", idx);
@@ -390,9 +413,9 @@ std::vector<BoundingBox> ObjectDetect::nonMaximumSuppression(const float nmsThre
     std::stable_sort(binfo.begin(), binfo.end(),
                      [](const BoundingBox &b1, const BoundingBox &b2) { return b1.score > b2.score; });
     std::vector<BoundingBox> out;
-    for (auto &i : binfo) {
+    for (auto &i: binfo) {
         bool keep = true;
-        for (auto &j : out) {
+        for (auto &j: out) {
             if (keep) {
                 float overlap = computeIoU(i, j);
                 keep = overlap <= nmsThresh;
@@ -408,11 +431,11 @@ std::vector<BoundingBox>
 ObjectDetect::nmsAllClasses(const float nmsThresh, std::vector<BoundingBox> &binfo, const uint numClasses) {
     std::vector<BoundingBox> result;
     std::vector<std::vector<BoundingBox>> splitBoxes(numClasses);
-    for (auto &box : binfo) {
+    for (auto &box: binfo) {
         splitBoxes.at(box.attribute).push_back(box);
     }
 
-    for (auto &boxes : splitBoxes) {
+    for (auto &boxes: splitBoxes) {
         boxes = nonMaximumSuppression(nmsThresh, boxes);
         result.insert(result.end(), boxes.begin(), boxes.end());
     }

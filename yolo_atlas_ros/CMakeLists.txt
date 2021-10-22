@@ -42,6 +42,8 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         ros_rs_msgs
         roslib
+
+        nodelet
         )
 
 # Header path
@@ -90,13 +92,27 @@ add_executable(main_ros
         src/object_detect_ros.cpp
         src/main_ros.cpp
         )
-
 target_link_libraries(main_ros
         ascendcl
         acl_dvpp
         stdc++
         ${catkin_LIBRARIES}
+        dw
         )
-
 add_dependencies(main_ros ros_rs_msgs_generate_messages_cpp)
 #install(TARGETS main_ros DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+add_library(yolo_atlas_nodelet
+        src/yolo_atlas_nodelet.cpp
+        src/utils.cpp
+        src/model_process.cpp
+        src/object_detect_ros.cpp
+        )
+target_link_libraries(yolo_atlas_nodelet
+        ascendcl
+        acl_dvpp
+        stdc++
+        ${catkin_LIBRARIES}
+        dw
+        )
+add_dependencies(yolo_atlas_nodelet ros_rs_msgs_generate_messages_cpp)

@@ -63,12 +63,15 @@ public:
 
     Result Postprocess(cv::Mat &frame, aclmdlDataset *modelOutput, std::vector<BoundingBox> &detectionResults);
 
+    Result SetCreateContext();
+
+    //Loading reasoning model
+    Result InitModel();
+
 private:
     //Initializes the ACL resource
     Result InitResource();
 
-    //Loading reasoning model
-    Result InitModel(const char *omModelPath);
 
     Result CreateModelInputdDataset();
 
@@ -100,6 +103,8 @@ private:
 private:
     int32_t deviceId_;  //Device ID, default is 0
     ModelProcess model_; //Inference model instance
+
+    aclrtContext ctx1;
 
     const char *pkgPath_; //Offline pkg path
     const char *modelPath_; //Offline model file path

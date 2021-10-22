@@ -43,10 +43,10 @@ void ModelProcess::DestroyResource() {
 }
 
 Result ModelProcess::LoadModelFromFileWithMem(const char *modelPath) {
-    if (loadFlag_) {
-        ERROR_LOG("has already loaded a model");
-        return FAILED;
-    }
+//    if (loadFlag_) {
+//        ERROR_LOG("has already loaded a model");
+//        return FAILED;
+//    }
 
     aclError ret = aclmdlQuerySize(modelPath, &modelMemSize_, &modelWeightSize_);
     if (ret != ACL_ERROR_NONE) {
@@ -225,7 +225,7 @@ Result ModelProcess::Execute()
 {
     aclError ret = aclmdlExecute(modelId_, input_, output_);
     if (ret != ACL_ERROR_NONE) {
-        ERROR_LOG("execute model failed, modelId is %u", modelId_);
+        ERROR_LOG("execute model failed, modelId is %u. ret = %d", modelId_, ret);
         return FAILED;
     }
 
