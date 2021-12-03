@@ -59,8 +59,6 @@ public:
     Result Inference(aclmdlDataset *&inferenceOutput);
 
     //Inference output post-processing
-    Result Postprocess(cv::Mat &frame, aclmdlDataset *modelOutput);
-
     Result Postprocess(cv::Mat &frame, aclmdlDataset *modelOutput, std::vector<BoundingBox> &detectionResults);
 
     Result SetCreateContext();

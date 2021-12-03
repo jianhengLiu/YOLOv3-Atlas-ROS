@@ -93,7 +93,7 @@ namespace yolo_atlas_nodelet_ns {
                 }
 
                 if (!img_buf.empty()) {
-                    double start_t = ros::Time::now().toSec();
+//                    double start_t = ros::Time::now().toSec();
 
                     m_buf.lock();
                     sensor_msgs::ImageConstPtr img_msg = img_buf.front();
@@ -143,8 +143,8 @@ namespace yolo_atlas_nodelet_ns {
 //            }
                     }
                     pub_results.publish(detection_msgs);
-                    double end_t = ros::Time::now().toSec();
-                    cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
+//                    double end_t = ros::Time::now().toSec();
+//                    cout << "YOLO cost: " << to_string(end_t - start_t) << " s" << endl;
                 }
 
                 std::chrono::milliseconds dura(10);

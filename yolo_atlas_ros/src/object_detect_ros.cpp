@@ -283,8 +283,8 @@ Result ObjectDetect::Postprocess(cv::Mat &frame,
         //Construct a string that marks the object: object name + confidence
         oneResult.attribute = detectData[totalBox * LABEL + i];
         oneResult.result_text = yolov3Label[oneResult.attribute];
-        printf("%d %d %d %d %s\n", oneResult.lt.x, oneResult.lt.y,
-               oneResult.rb.x, oneResult.rb.y, oneResult.result_text.c_str());
+//        printf("%d %d %d %d %s\n", oneResult.lt.x, oneResult.lt.y,
+//               oneResult.rb.x, oneResult.rb.y, oneResult.result_text.c_str());
 
         detectionResults.emplace_back(oneResult);
     }

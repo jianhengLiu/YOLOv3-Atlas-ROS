@@ -70,22 +70,6 @@ link_directories(
         ${INC_PATH}/atc/lib64
 )
 
-#add_executable(main
-#        utils.cpp
-#        model_process.cpp
-#        smobject.cpp
-#        object_detect_nms_smobject.cpp
-#        main_smobject.cpp
-#        )
-#
-#if (target STREQUAL "Simulator_Function")
-#    target_link_libraries(main funcsim)
-#else ()
-#    target_link_libraries(main ascendcl acl_dvpp stdc++ opencv_highgui opencv_core opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_features2d opencv_videoio protobuf presenteragent)
-#endif ()
-#
-#install(TARGETS main DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
 add_executable(main_ros
         src/utils.cpp
         src/model_process.cpp
@@ -101,6 +85,21 @@ target_link_libraries(main_ros
         )
 add_dependencies(main_ros ros_rs_msgs_generate_messages_cpp)
 #install(TARGETS main_ros DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+add_executable(main_ros_compressed
+        src/utils.cpp
+        src/model_process.cpp
+        src/object_detect_ros.cpp
+        src/main_ros_compressedImg.cpp
+        )
+target_link_libraries(main_ros_compressed
+        ascendcl
+        acl_dvpp
+        stdc++
+        ${catkin_LIBRARIES}
+        dw
+        )
+add_dependencies(main_ros_compressed ros_rs_msgs_generate_messages_cpp)
 
 add_library(yolo_atlas_nodelet
         src/yolo_atlas_nodelet.cpp
